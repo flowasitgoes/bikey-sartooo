@@ -1,0 +1,126 @@
+const express = require('express');
+const path = require('path');
+const fs = require('fs-extra');
+
+class LocalServer {
+    constructor(port = 3000, publicDir = './public') {
+        this.port = port;
+        this.publicDir = publicDir;
+        this.app = express();
+        this.setupMiddleware();
+        this.setupRoutes();
+    }
+
+    setupMiddleware() {
+        // 静态文件服务
+        this.app.use(express.static(this.publicDir, {
+            setHeaders: (res, path) => {
+                // 设置字体文件的正确MIME类型
+                if (path.endsWith('.woff2')) {
+                    res.setHeader('Content-Type', 'font/woff2');
+                } else if (path.endsWith('.woff')) {
+                    res.setHeader('Content-Type', 'font/woff');
+                } else if (path.endsWith('.ttf')) {
+                    res.setHeader('Content-Type', 'font/ttf');
+                } else if (path.endsWith('.eot')) {
+                    res.setHeader('Content-Type', 'application/vnd.ms-fontobject');
+                }
+            }
+        }));
+        
+        // 处理HTML文件扩展名
+        this.app.use((req, res, next) => {
+            if (req.path.endsWith('/')) {
+                const indexPath = path.join(this.publicDir, req.path, 'index.html');
+                if (fs.existsSync(indexPath)) {
+                    return res.sendFile(path.resolve(indexPath));
+                }
+            }
+            next();
+        });
+
+        // 处理没有扩展名的请求
+        this.app.use((req, res, next) => {
+            const ext = path.extname(req.path);
+            if (!ext) {
+                const htmlPath = path.join(this.publicDir, req.path + '.html');
+                if (fs.existsSync(htmlPath)) {
+                    return res.sendFile(path.resolve(htmlPath));
+                }
+            }
+            next();
+        });
+    }
+
+    setupRoutes() {
+        // 根路径重定向到index.html
+        this.app.get('/', (req, res) => {
+            const indexPath = path.join(this.publicDir, 'index.html');
+            if (fs.existsSync(indexPath)) {
+                res.sendFile(path.resolve(indexPath));
+            } else {
+                res.status(404).send('Index file not found');
+            }
+        });
+
+        // 404处理
+        this.app.use((req, res) => {
+            res.status(404).send(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>404 - Page Not Found</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                        h1 { color: #333; }
+                        p { color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <h1>404 - Page Not Found</h1>
+                    <p>The requested page could not be found.</p>
+                    <a href="/">Go back to home</a>
+                </body>
+                </html>
+            `);
+        });
+    }
+
+    async start() {
+        try {
+            // 检查public目录是否存在
+            if (!await fs.pathExists(this.publicDir)) {
+                console.error(`❌ 错误: 目录 ${this.publicDir} 不存在`);
+                console.log('请先运行下载脚本: npm start');
+                process.exit(1);
+            }
+
+            this.app.listen(this.port, () => {
+                console.log(`🚀 本地服务器已启动!`);
+                console.log(`📱 访问地址: http://localhost:${this.port}`);
+                console.log(`📁 服务目录: ${path.resolve(this.publicDir)}`);
+                console.log(`\n按 Ctrl+C 停止服务器`);
+            });
+
+        } catch (error) {
+            console.error('❌ 启动服务器失败:', error.message);
+            process.exit(1);
+        }
+    }
+}
+
+// 主函数
+async function main() {
+    const port = process.env.PORT || 3000;
+    const publicDir = './public';
+    
+    const server = new LocalServer(port, publicDir);
+    await server.start();
+}
+
+// 运行服务器
+if (require.main === module) {
+    main().catch(console.error);
+}
+
+module.exports = LocalServer;
