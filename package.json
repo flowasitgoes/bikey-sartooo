@@ -5,7 +5,7 @@
   "main": "download.js",
   "scripts": {
     "start": "node download.js",
-    "serve": "node serve.js"
+    "serve": "node server.js"
   },
   "dependencies": {
     "puppeteer": "^21.0.0",

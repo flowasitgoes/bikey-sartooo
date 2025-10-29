@@ -138,9 +138,12 @@ async function main() {
     await server.start();
 }
 
+// 导出类和启动函数
+module.exports = LocalServer;
+module.exports.LocalServer = LocalServer;
+module.exports.start = main;
+
 // 运行服务器
 if (require.main === module) {
     main().catch(console.error);
 }
-
-module.exports = LocalServer;
