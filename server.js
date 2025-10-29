@@ -63,6 +63,26 @@ class LocalServer {
             }
         });
 
+        // Support 页面重定向到 /en/ 目录
+        const supportPages = [
+            'a-sarto-is-forever',
+            'faq-and-warranty',
+            'register-your-sarto',
+            'contacts',
+            'dealers'
+        ];
+        
+        supportPages.forEach(page => {
+            this.app.get(`/${page}`, (req, res) => {
+                const pagePath = path.join(this.publicDir, 'en', `${page}.html`);
+                if (fs.existsSync(pagePath)) {
+                    res.sendFile(path.resolve(pagePath));
+                } else {
+                    res.status(404).send('Page not found');
+                }
+            });
+        });
+
         // 404处理
         this.app.use((req, res) => {
             res.status(404).send(`
