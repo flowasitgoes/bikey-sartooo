@@ -5,7 +5,9 @@
   "main": "download.js",
   "scripts": {
     "start": "node download.js",
-    "serve": "node server.js"
+    "serve": "node server.js",
+    "dev": "node server.js",
+    "vercel-build": "echo 'Static site - no build needed'"
   },
   "dependencies": {
     "puppeteer": "^21.0.0",
