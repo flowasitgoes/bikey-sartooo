@@ -77,6 +77,14 @@
       "dest": "/public/en/bikes.html"
     },
     {
+      "src": "^/it/biciclette/([^/]+)/?$",
+      "dest": "/public/it/biciclette/$1.html"
+    },
+    {
+      "src": "^/bikes/([^/]+)/?$",
+      "dest": "/public/it/biciclette/$1.html"
+    },
+    {
       "src": "/collaborations",
       "dest": "/public/en/collaborations.html"
     },
