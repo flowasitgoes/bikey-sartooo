@@ -1,0 +1,9 @@
+
+> sarto-bikes-downloader@1.0.0 dev
+> node server.js
+
+🚀 本地服务器已启动!
+📱 访问地址: http://localhost:3000
+📁 服务目录: /Users/flowasitgoes/Sartooo/public
+
+按 Ctrl+C 停止服务器

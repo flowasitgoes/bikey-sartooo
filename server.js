@@ -83,6 +83,40 @@ class LocalServer {
             });
         });
 
+        // 義大利語單車頁面路由
+        const italianBikePages = {
+            'raso-tri-composite': 'raso-tri-composite.html',
+            'seta-plus-tri-composite': 'seta-plus-tri-composite.html',
+            'seta-gravel-plus-tri-composite': 'seta-gravel-plus-tri-composite.html',
+            'raso': 'raso.html',
+            'raso-gravel-wide': 'raso-gravel-wide.html',
+            'raso-gravel': 'raso-gravel.html',
+            'seta-plus': 'seta-plus.html',
+            'lampo-plus': 'lampo-plus.html',
+            'asola-plus': 'asola-plus.html',
+            'gravel-ta-plus': 'gravel-ta-plus.html',
+            'doppio': 'doppio.html',
+            'seta-rim': 'seta-rim.html',
+            'asola': 'asola.html',
+            'veneto-sl': 'veneto-sl.html'
+        };
+
+        this.app.get(['/bikes/:slug', '/bikes/:slug/'], (req, res, next) => {
+            const { slug } = req.params;
+            const targetFile = italianBikePages[slug];
+
+            if (!targetFile) {
+                return next();
+            }
+
+            const filePath = path.join(this.publicDir, 'it', 'biciclette', targetFile);
+            if (fs.existsSync(filePath)) {
+                return res.sendFile(path.resolve(filePath));
+            }
+
+            res.status(404).send('Page not found');
+        });
+
         // 404处理
         this.app.use((req, res) => {
             res.status(404).send(`
